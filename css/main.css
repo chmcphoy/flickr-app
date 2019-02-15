@@ -1,0 +1,114 @@
+body {
+	background-color: #1c2532;
+	color: #a9c7df;
+	font-family: Lato, sans-serif;
+	padding: 0;
+	margin: 0;
+	margin-bottom: 80px;
+}
+.app-title {
+	font-size: 3em;
+}
+a {
+	color: inherit;
+	text-decoration: none;
+}
+h1,
+h2 {
+	text-align: center;
+	text-shadow: 1px 1px rgba(0, 0, 0, 0.1);
+}
+img {
+	display: block;
+	max-width: 100%;
+}
+.fk-thumbnails {
+	text-align: center;
+}
+.fk-photo {
+	display: inline-block;
+	vertical-align: top;
+	cursor: pointer;
+	margin: 3px;
+	border: 1px solid transparent;
+	width: 150px;
+	height: 150px;
+	column-count: auto;
+	-webkit-column-count: auto;
+	-moz-column-count: auto;
+}
+.fk-photo:hover {
+	border-color: #a9c7df;
+}
+.pg-container {
+	text-align: center;
+}
+.pg-pager {
+	display: inline-block;
+	cursor: pointer;
+	font-size: 5em;
+}
+.pg-pager:hover {
+	color: #323e4f;
+}
+.pg-hidden {
+	display: none;
+}
+.lightbox-container {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #1c2532;
+}
+.lightbox-show {
+	display: block;
+}
+.lightbox-image {
+	margin: 0 auto;
+}
+.lightbox-close {
+	position: absolute;
+	right: 20px;
+	top: 20px;
+	cursor: pointer;
+	font-family: 'Comic Sans MS', sans-serif;
+}
+.lightbox-close:hover {
+	color: #323e4f;
+}
+.lightbox-arrow {
+	position: fixed;
+	top: 50%;
+	width: 70px;
+	height: 70px;
+	margin-top: -35px;
+	line-height: 60px;
+	font-size: 4em;
+	text-align: center;
+	cursor: pointer;
+	font-family: 'Comic Sans MS', sans-serif;
+	background-color: #a9c7df;
+	color: #fafbfc;
+}
+.lightbox-arrow:hover {
+	background-color: #323e4f;
+}
+.lightbox-prev {
+	border-radius: 0 6px 6px 0;
+}
+.lightbox-next {
+	border-radius: 6px 0 0 6px;
+	right: 0;
+}
+.lightbox-disabled {
+	background-color: #442e42;
+	color: #583554;
+	cursor: not-allowed;
+}
+.lightbox-disabled:hover {
+	background-color: #442e42;
+}
+
