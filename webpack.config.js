@@ -22,9 +22,10 @@ module.exports = {
             }
         ]
     },
-    node : {
-        fs : 'empty'
-    }
+		devServer: {
+				port: 8080,
+				publicPath: '/public/'
+	},
 };
 
 
