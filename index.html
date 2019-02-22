@@ -1,26 +1,34 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Flickr App | Cat Gallery</title>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
+	<head>
+		<title>Flickr App</title>
+
+		<meta charset="utf-8">
+		<meta name="description" content="">
+		<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-		<link rel="stylesheet" href="src/css/main.css">
-  </head>
-  <body>
-    <h1 class='app-title'>Flicker App | Cats</h1>
-    <div class='fk-thumbnails'></div>
-    <div class='lightbox-container lightbox-hidden'>
-      <h2><span class='lightbox-close'>x</span><span class='lightbox-title'></span></h2>
-      <img class='lightbox-image'/>
-      <div class='lightbox-arrow lightbox-prev'>&lt;</div>
-      <div class='lightbox-arrow lightbox-next'>&gt;</div>
-    </div>
-    <footer class='pg-container'>
-      <div class='pg-pager pg-hidden'>...</div>
-    </footer>
-  </body>
-	<script src="public/bundle.js"></script>
+		<link rel="stylesheet" href="src/css/normalize.css" type="text/css">
+		<link rel="stylesheet" href="src/css/main.css" type="text/css">
+	</head>
+
+	<body>
+		<h1 class='app-title'>Flicker App | Cats</h1>
+		<section class="page">
+			<ul id="thumbnails" class="thumbnails"></ul>
+		</section>
+
+		<div id="overlay">
+			<div id="modal">
+				<img id="image" src="http://via.placeholder.com/1200x600"/>
+				<p id="imgTitle" class="title"></p>
+				<div id="closeBtn">&#10005;</div>
+				<div id="previousBtn" class="arrow" onclick="nextImage('prev')">&#10094;</div>
+				<div id="nextBtn" class="arrow" onclick="nextImage('next')">&#10095;</div>
+			</div>
+		</div>
+	<script src="src/js/index.js"></script>
+	</body>
 </html>
+
 

@@ -1,164 +1,121 @@
-void function (window, document) {
-	var nextPage = 1;
-	var thumbnails = $('.fk-thumbnails');
-	var pager = $('.pg-pager');
-	var lightbox = $('.lightbox-container');
-	var lightboxTitle = $('.lightbox-title', lightbox);
-	var lightboxImage = $('.lightbox-image', lightbox);
-	var lightboxPrev = $('.lightbox-prev', lightbox);
-	var lightboxNext = $('.lightbox-next', lightbox);
-	var selection;
+/*
+ * Flickr cat gallery source URL: 
+ * https://www.flickr.com/photos/celeste/galleries/72157690638331410
+ */
+const flickrGalleryId = "72157690638331410"; 
 
-	more();
-	thumbnails.addEventListener('click', clickedThumbnail);
-	pager.addEventListener('click', clickedPager);
-	lightbox.addEventListener('click', hide);
-	lightboxPrev.addEventListener('click', stop(prev));
-	lightboxNext.addEventListener('click', stop(next));
-	document.addEventListener('keydown', shortcuts);
+const maxThumbnails = 15; 
+const thumbnailContainer = document.getElementById('thumbnails');
+const overlay = document.getElementById("overlay");
+const nextBtn = document.getElementById("nextBtn");
+const previousBtn = document.getElementById("previousBtn");
+const imgModal = document.getElementById("image");
+const imgTitle = document.getElementById("imgTitle");
+let nextImgId;
+let currentImgId;
 
-	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.register('serviceworker.js');
-	}
+const createThumbnail = (nr, url, title) => {
+    let thumbnail = document.createElement('li');
+    thumbnail.id = nr + 1;
+    thumbnail.classList.add("thumbnail");
+    thumbnail.innerHTML = '<img src="' + url + '" title="'+ title +'"/>';
+    thumbnailContainer.appendChild(thumbnail);
+}
 
-	function clickedThumbnail (e) {
-		var el = e.target;
-		if (el.tagName === 'IMG') {
-			highlight(el);
-		}
-	}
+// Load JSON data
+const loadPhotos = (callback) => {
+    var oReq = new XMLHttpRequest();
+    oReq.overrideMimeType("application/json");
+    oReq.open("GET", 'https://api.flickr.com/services/rest/?method=flickr.galleries.getPhotos&api_key=ea7a6c59a7448849dc354beb1518ac69&gallery_id='+flickrGalleryId+'&format=json&nojsoncallback=1', true);
+    oReq.onreadystatechange = () => {
+        if (oReq.readyState === 4 && oReq.status == "200") {
+            callback(oReq.responseText);
+        }
+    }
+    oReq.send(null);
+}
 
-	function clickedPager () {
-		setClass(pager, 'pg-hidden', true);
-		more();
-	}
+// Parse JSON & populate data
+loadPhotos((text) => {
+    const data = JSON.parse(text);
+    photo = data.photos.photo;
+    
+    for (let i = 0; i < maxThumbnails; i++) {
+        const farmId = photo[i].farm;
+        const serverId = photo[i].server;
+        const id = photo[i].id;
+        const secret = photo[i].secret;
+        const title = photo[i].title;
+        const imageUrl = 'https://farm' + farmId + '.staticflickr.com/' + serverId + '/' + id + '_' + secret + '.jpg';
 
-	function shortcuts (e) {
-		if (!selection) {
-			return;
-		}
-		var esc = 27;
-		var left = 37;
-		var right = 39;
-		if (left === e.which) {
-			prev();
-		} else if (right === e.which) {
-			next();
-		} else if (esc === e.which) {
-			hide();
-		}
-	}
+       createThumbnail(i, imageUrl, title);
+    }
+});
 
-	function stop (fn) {
-		return function (e) {
-			e.stopPropagation();
-			return fn.apply(this, arguments);
-		};
-	}
+// Eventhandlers
+thumbnailContainer.addEventListener("click", (e) => {
+    
+    // Image modal & title for each thumbnail
+    imgModal.src = e.target.getAttribute("src");
+    imgTitle.innerHTML = e.target.getAttribute("title");
 
-	function prev () {
-		if (selection.previousSibling) {
-			highlight(selection.previousSibling);
-		}
-	}
+    // Display overlay
+    overlay.style.display = "block";
+    setTimeout(function() {
+        overlay.classList.add("show");
+    }, 50);
+    
 
-	function next () {
-		if (selection.nextSibling) {
-			highlight(selection.nextSibling);
-		}
-	}
+    // Assign currentImgId variable to thumb clicked
+    currentImgId = e.target.parentNode.id;
 
-	function invalidate () {
-		setClass(lightboxPrev, 'lightbox-disabled', !selection.previousSibling);
-		setClass(lightboxNext, 'lightbox-disabled', !selection.nextSibling);
-	}
+		// Hide prev & next btn on first & last image
+    if (currentImgId >= maxThumbnails) {
+        nextBtn.style.display = "none";
+    } else if (currentImgId <= 1) {
+        previousBtn.style.display = "none";
+    }
+});
 
-	function highlight (thumb) {
-		text(lightboxTitle, thumb.getAttribute('data-title'));
-		lightboxImage.src = thumb.getAttribute('data-large');
-		selection = thumb;
-		setClass(lightbox, 'lightbox-show', true);
-		invalidate();
-	}
 
-	function hide () {
-		selection = null;
-		setClass(lightbox, 'lightbox-show', false);
-	}
+// Lightbox: Get & load next img
+const nextImage = (direction) => {
+    if (direction == "prev") {
+        nextImgID = Number(currentImgId) - 1;
+    } else if (direction == "next") {
+        nextImgID = Number(currentImgId) + 1;
+    }
 
-	function more () {
-		search('cute', 'kitten', nextPage++);
-	}
+    // Assign img modal & title to next thumbnail
+    imgModal.src = document.getElementById(nextImgID).firstChild.getAttribute("src");
+    imgTitle.innerHTML = document.getElementById(nextImgID).firstChild.getAttribute("title");
 
-	function search (terms, tags, page) {
-		var query = {
-			api_key: '7f1075dd1213418aab4d5a69ed12357a',
-			method: 'flickr.photos.search',
-			format: 'json',
-			tags: tags,
-			text: terms,
-			page: page,
-			per_page: 50
-		};
-		var url = 'https://api.flickr.com/services/rest';
-		jsonp(url, query, renderPhotos);
-	}
+    currentImgId = nextImgID;
 
-	function renderPhotos (data) {
-		data.photos.photo.forEach(renderPhoto);
-		setClass(pager, 'pg-hidden', false);
-	}
+    // Show/hide nextBtn
+    if (currentImgId >= maxThumbnails) {
+        nextBtn.style.display = "none";
+    } else {
+        nextBtn.style.display = "block";
+    }
 
-	function renderPhoto (photo) {
-		var thumb = tag('img', 'fk-photo');
-		thumb.src = buildFlickrPhotoUrl(photo, '_q');
-		thumb.setAttribute('data-large', buildFlickrPhotoUrl(photo));
-		thumb.setAttribute('data-title', photo.title);
-		thumbnails.appendChild(thumb);
-	}
+    // Show/hide previousBtn
+    if (currentImgId <= 1) {
+        previousBtn.style.display = "none";
+    } else {
+        previousBtn.style.display = "block";
+    }
+}
 
-	function buildFlickrPhotoUrl (photo, postfix) {
-		return [
-			'https://farm', photo.farm,
-			'.staticflickr.com/', photo.server,
-			'/', photo.id,
-			'_', photo.secret,
-			postfix || '',
-			'.jpg'].join('');
-	}
 
-	function tag (name, className) {
-		var el = document.createElement(name);
-		if (className) {
-			el.className = className;
-		}
-		return el;
-	}
+// Shut down lightbox
+const closeBtn = document.getElementById("closeBtn");
 
-	function text (el, value) {
-		el.textContent = el.innerText = value;
-	}
+closeBtn.onclick = () => {
+    overlay.style.display = "none";
+    overlay.classList.remove("show");
 
-	function jsonp (url, query, done) {
-		var key = query.jsoncallback = '_jsonp';
-		var script = tag('script');
-		script.src = url + qs(query);
-		window[key] = done;
-		document.body.appendChild(script);
-	}
-
-	function qs (query) {
-		return '?' + Object.keys(query).map(keyValuePair).join('&');
-		function keyValuePair (key) {
-			return key + '=' + query[key];
-		}
-	}
-
-	function setClass (el, className, enabled) {
-		el.classList[enabled ? 'add' : 'remove'](className);
-	}
-
-	function $ (selector, context) {
-		return (context || document).querySelector(selector);
-	}
-}(window, document);
+    currentImgId = "";
+    nextBtn.style.display = "block";
+    previousBtn.style.display = "block";
+}
